@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card shadow p-4" style="width: 400px;">
+            <h3 class="text-center">Login</h3>
+            
+            <form id="loginForm">
+                <!-- Role Selection -->
+                <div class="mb-3">
+                    <label class="form-label">Select Role</label>
+                    <select class="form-control" id="roleSelect" required>
+                        <option value="">Choose...</option>
+                        <option value="manufacturer">Manufacturer</option>
+                        <option value="seller">Seller</option>
+                        <option value="consumer">Consumer</option>
+                    </select>
+                </div>
+
+                <!-- Manufacturer Fields -->
+                <div id="manufacturerFields" class="d-none">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="manufacturerEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="manufacturerPassword">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Manufacture ID</label>
+                        <input type="text" class="form-control" id="companyID">
+                    </div>
+                </div>
+
+                <!-- Seller Fields -->
+                <div id="sellerFields" class="d-none">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="sellerEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="sellerPassword">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Store ID</label>
+                        <input type="text" class="form-control" id="storeID">
+                    </div>
+                </div>
+
+                <!-- Consumer Fields -->
+                <div id="consumerFields" class="d-none">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="consumerEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="consumerPassword">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <p class="text-center mt-2">Don't have an account? <a href="signup.html">Sign Up</a></p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Handle Role Selection
+        document.getElementById("roleSelect").addEventListener("change", function () {
+            let role = this.value;
+
+            document.getElementById("manufacturerFields").classList.add("d-none");
+            document.getElementById("sellerFields").classList.add("d-none");
+            document.getElementById("consumerFields").classList.add("d-none");
+
+            document.querySelectorAll("#loginForm input").forEach(input => {
+                input.value = "";
+                input.removeAttribute("required");
+            });
+
+            if (role) {
+                let activeFields = document.getElementById(role + "Fields");
+                activeFields.classList.remove("d-none");
+                activeFields.querySelectorAll("input").forEach(input => input.setAttribute("required", "true"));
+            }
+        });
+
+        // Handle Login Form Submission
+        document.getElementById("loginForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const role = document.getElementById("roleSelect").value;
+            let email, password, extraData = {};
+
+            if (role === "manufacturer") {
+                email = document.getElementById("manufacturerEmail").value;
+                password = document.getElementById("manufacturerPassword").value;
+                extraData.companyID = document.getElementById("companyID").value;
+            } else if (role === "seller") {
+                email = document.getElementById("sellerEmail").value;
+                password = document.getElementById("sellerPassword").value;
+                extraData.storeID = document.getElementById("storeID").value;
+            } else if (role === "consumer") {
+                email = document.getElementById("consumerEmail").value;
+                password = document.getElementById("consumerPassword").value;
+            }
+
+            if (!role || !email || !password) {
+                alert("Please fill all required fields");
+                return;
+            }
+
+            const data = { role, email, password, ...extraData };
+
+            try {
+                const response = await fetch("http://localhost:5000/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+
+                let result;
+                try {
+                    result = await response.json();
+                } catch {
+                    alert("Error: Unable to connect to the server.");
+                    return;
+                }
+
+                if (response.ok) {
+                    alert("Login successful!");
+                    localStorage.setItem("authToken", result.token); // Store token
+                    window.location.href = result.redirectURL;
+                } else {
+                    alert(result.error || "Login failed.");
+                }
+            } catch (error) {
+                alert("Network error: " + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
