@@ -1,6 +1,7 @@
 🔒 Fake Product Identification Using Blockchain Technology
 
 📌 Overview
+
 This project is a decentralized application (DApp) designed to combat counterfeit products by leveraging the power of blockchain technology. It enables manufacturers to register authentic products on the blockchain, while sellers and consumers can verify a product's legitimacy using its unique ID.
 
 By storing product data on the Ethereum blockchain, the system ensures transparency, immutability, and trust across the supply chain — from the factory to the end user.
