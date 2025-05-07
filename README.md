@@ -43,8 +43,7 @@ Consumers
 --------------------
 
 1. Clone the Repository
-   git clone https://github.com/yourusername/fake-product-identification.git
-   cd fake-product-identification
+   git clone https://github.com/Maythadarkyaw123/Product-Identification-Using-Blockchain-Technology.git
 
 2. Install Dependencies
    npm install
